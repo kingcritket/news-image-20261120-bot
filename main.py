@@ -1,28 +1,29 @@
-"""news-image-20261120 entry: place the bundled image at the output path.
+#!/usr/bin/env python3
+"""Ship entry.png to the make.fun output directory.
 
-The program is deliberately boring: it copies entry.png, byte for byte,
-into MAKEFUN_OUTPUT_DIR (or /output when the variable is unset). No
-network, no randomness, no re-encoding, so two runs always write
-identical bytes. The picture itself is produced by build_entry.py from
-the scene photos in assets/; this file only delivers it.
+Reads MAKEFUN_OUTPUT_DIR (default /output), creates it if needed, and
+copies the built front page there. No network, no signing, no wallet.
 """
 
 import os
-import sys
+import shutil
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+SOURCE = HERE / "entry.png"
 
-def main() -> int:
-    root = Path(__file__).resolve().parent
-    source = root / "entry.png"
-    if not source.is_file():
-        print("entry.png is missing next to main.py", file=sys.stderr)
-        return 1
-    destination = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
-    destination.mkdir(parents=True, exist_ok=True)
-    (destination / "entry.png").write_bytes(source.read_bytes())
-    return 0
+
+def main():
+    if not SOURCE.is_file():
+        raise SystemExit(f"missing {SOURCE} — run build_entry.py first")
+    target_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+    target_dir.mkdir(parents=True, exist_ok=True)
+    dest = target_dir / "entry.png"
+    shutil.copyfile(SOURCE, dest)
+    if dest.stat().st_size != SOURCE.stat().st_size:
+        raise SystemExit(f"copy incomplete: {dest} size mismatch")
+    print(f"copied {SOURCE} -> {dest} ({dest.stat().st_size} bytes)")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
