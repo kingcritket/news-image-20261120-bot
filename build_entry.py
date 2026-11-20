@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""Build the news-image-20261120 front page (1024x1024 PNG).
+"""Build the news-image-20261120 front page, v3 (1024x1024 PNG).
 
 One image summing up Friday 20 November 2026: three scene photos with
-PIL-drawn headlines, an ALSO TODAY panel with six more stories, a dotted
+PIL-drawn headlines, an ALSO TODAY panel with five more stories, a dotted
 world map in the header and a ticker footer. Every word is drawn by PIL;
 the photos carry no baked-in text.
+
+v3 fixes v2's faithfulness defects: the ICJ Myanmar ruling (delivered
+19 Nov), the Voyager 1 light-day milestone (18 Nov), the Hayabusa2
+announcement (17 Nov) and the Pete Rose pardon (announced 19 Nov) are
+gone, and the GTA VI panel now uses Sensor Tower's updated estimate as
+reported on 20 Nov, labelled (EST.). Every remaining item was verified
+against reporting dated 20 November 2026.
 
 Run:  python3 build_entry.py   -> writes entry.png next to this script.
 """
@@ -144,6 +151,32 @@ def pictogram(draw, cx, cy, kind, colour):
                 fill=colour, width=w,
             )
         draw.ellipse((cx - 3, cy - 3, cx + 3, cy + 3), fill=colour)
+    elif kind == "chart":  # wall street sell-off
+        draw.line((cx - 13, cy + 12, cx + 13, cy + 12), fill=colour, width=w)
+        draw.line((cx - 13, cy - 10, cx - 4, cy - 2), fill=colour, width=w)
+        draw.line((cx - 4, cy - 2, cx + 4, cy + 3), fill=colour, width=w)
+        draw.line((cx + 4, cy + 3, cx + 13, cy + 10), fill=colour, width=w)
+        draw.polygon([(cx + 13, cy + 4), (cx + 13, cy + 12), (cx + 6, cy + 11)],
+                     fill=colour)
+    elif kind == "leaf":  # cop31 climate talks
+        draw.polygon(
+            [(cx, cy - 13), (cx + 11, cy - 4), (cx + 9, cy + 8),
+             (cx, cy + 13), (cx - 9, cy + 8), (cx - 11, cy - 4)],
+            outline=colour, width=w,
+        )
+        draw.line((cx, cy - 10, cx, cy + 11), fill=colour, width=w)
+        draw.line((cx, cy - 2, cx + 6, cy - 6), fill=colour, width=w)
+        draw.line((cx, cy + 3, cx - 6, cy - 1), fill=colour, width=w)
+    elif kind == "swirl":  # cyclone xavier
+        import math
+        for k in range(3):
+            a0 = 120 * k
+            draw.arc((cx - 12, cy - 12, cx + 12, cy + 12), a0, a0 + 100,
+                     fill=colour, width=w)
+            a1 = a0 + 180
+            draw.arc((cx - 6, cy - 6, cx + 6, cy + 6), a1, a1 + 100,
+                     fill=colour, width=w)
+        draw.ellipse((cx - 2, cy - 2, cx + 2, cy + 2), fill=colour)
     elif kind == "ball":  # pete rose
         draw.ellipse((cx - 12, cy - 12, cx + 12, cy + 12), outline=colour, width=w)
         draw.arc((cx - 12, cy - 16, cx + 4, cy + 16), 300, 60, fill=colour, width=w)
@@ -155,40 +188,38 @@ TOP_STORIES = [
     {
         "photo": "media-generation-trump-plane-night-0-f12400ba-06c9-4b0d-a00e-100e4edfadc2.webp",
         "headline": "TRUMP DELAYS IRAN DECISION TO 2027",
-        "deck": "\u201cWE\u2019LL SEE AFTER JANUARY 1,\u201d HE SAYS ON RETURN "
-                "FROM CHINA; SENATE REJECTS WAR-POWERS CURB 51\u201348",
+        "deck": "\u201cWE\u2019LL SEE AFTER JANUARY 1,\u201d HE SAYS ABOARD AIR "
+                "FORCE ONE; SENATE REJECTS WAR-POWERS CURB 51\u201348",
     },
     {
         "photo": "media-generation-cyclone-akvan-0-a7665993-77a3-4ceb-9152-15f1595f5e73.webp",
-        "headline": "CYCLONE AKVAN HITS INDIA TODAY",
-        "deck": "300,000 EVACUATED AS STORM MAKES LANDFALL BY NOON; "
-                "RED ALERTS, 69 TRAINS CANCELLED",
+        "headline": "CYCLONE AKVAN MAKES LANDFALL",
+        "deck": "STORM CROSSES COAST NEAR GOPALPUR BY NOON; 300,000 "
+                "EVACUATED, RED ALERTS, 69 TRAINS CANCELLED",
     },
     {
         "photo": "media-generation-vice-city-neon-0-c7e53773-cc3a-4fcd-beb5-e269edc67f9f.webp",
-        "headline": "GTA VI SALES TOP $1.8 BILLION",
-        "deck": "DAY-ONE SALES PASS THE ODYSSEY\u2019S GLOBAL RUN; "
-                "LAUNCH WEEK CONTINUES",
+        "headline": "GTA VI SALES TOP $2.36 BILLION (EST.)",
+        "deck": "SENSOR TOWER ESTIMATE: 24.6M COPIES ON DAY ONE; "
+                "TAKE-TWO HAS NOT CONFIRMED THE FIGURES",
     },
 ]
 
 ALSO_TODAY = [
-    ("scales", NAVY, "WORLD COURT: MYANMAR GUILTY OF GENOCIDE",
-     "ICJ 9\u20136: FIRST STATE EVER HELD LIABLE"),
-    ("planet", NAVY, "VOYAGER 1 PASSES A LIGHT-DAY",
-     "NASA CONFIRMS PROBE\u2019S DISTANCE MILESTONE"),
-    ("rocket", RED, "HAYABUSA2 ENGINE TROUBLE",
-     "JAPAN SCRAPS ASTEROID LANDING PLAN"),
     ("globe", NAVY, "EUROPE READY FOR RUSSIA TALKS",
      "LEADERS BACK NEGOTIATIONS TO END UKRAINE WAR"),
-    ("burst", RED, "HOUTHIS DAMAGE RIYADH TOWER",
-     "SAUDI CONFIRMS STRIKE ON LANDMARK BUILDING"),
-    ("ball", NAVY, "PETE ROSE PARDONED POSTHUMOUSLY",
-     "TRUMP CLEARS LATE STAR\u2019S 1990 TAX CONVICTION"),
+    ("burst", RED, "HOUTHIS HIT RIYADH\u2019S TALLEST TOWER",
+     "PIF HQ DAMAGED; SAUDI SAYS NO INJURIES"),
+    ("chart", RED, "WALL STREET TUMBLES AGAIN",
+     "S&P 500 FALLS 2.0%: SIXTH STRAIGHT DAY OF LOSSES"),
+    ("leaf", NAVY, "COP31: CLOSING DAY, NO DEAL YET",
+     "FOSSIL-FREE DRAFT FACES FINAL TEST IN ANTALYA"),
+    ("swirl", NAVY, "CYCLONE XAVIER: COOK ISLANDS ALERT",
+     "GALE WARNING SUWARROW; STORM ALERT PUKAPUKA"),
 ]
 
-TICKER = ("FIJI DECLARES DROUGHT DISASTER  \u2022  S. KOREA EXPORTS TOP $1TN"
-          "  \u2022  TAIWAN STEADIES STOCKS")
+TICKER = ("AKVAN: 423 RESCUE TEAMS DEPLOYED  \u2022  GTA VI: 75% OF COPIES "
+          "ON PLAYSTATION (EST.)  \u2022  TRUMP: \u201cNOT RUSHING\u201d ON IRAN")
 
 # ------------------------------------------------------------------ layout
 MARGIN = 24
@@ -208,17 +239,19 @@ def story_card(canvas, draw, x, y, w, photo_h, story):
     photo = Image.open(os.path.join(ASSETS, story["photo"])).convert("RGB")
     canvas.paste(cover(photo, w, photo_h), (x, y))
     cap_y = y + photo_h
-    cap_h = TOP_H - photo_h if y == TOP_Y else BOT_H - photo_h
-    draw.rectangle((x, cap_y, x + w, y + (TOP_H if y == TOP_Y else BOT_H)),
-                   outline=RULE, width=1)
-    pad = 14
-    head = fit(draw, story["headline"], 27, w - 2 * pad)
-    draw.text((x + pad, cap_y + 10), story["headline"], font=head, fill=NAVY)
+    cap_bottom = y + (TOP_H if y == TOP_Y else BOT_H)
+    draw.rectangle((x, cap_y, x + w, cap_bottom), outline=RULE, width=1)
+    # red editorial accent bar down the left edge of the caption
+    draw.rectangle((x, cap_y, x + 5, cap_bottom), fill=RED)
+    pad = 16
+    text_x = x + 5 + pad
+    head = fit(draw, story["headline"], 31, w - 5 - pad - 12)
+    draw.text((text_x, cap_y + 10), story["headline"], font=head, fill=NAVY)
     deck_font = font(REGULAR, 20)
-    lines = wrap(draw, story["deck"], deck_font, w - 2 * pad)
+    lines = wrap(draw, story["deck"], deck_font, w - 5 - pad - 12)
     yy = cap_y + 10 + head.size + 8
     for line in lines:
-        draw.text((x + pad, yy), line, font=deck_font, fill=GREY)
+        draw.text((text_x, yy), line, font=deck_font, fill=INK)
         yy += 25
 
 
@@ -240,7 +273,7 @@ def also_today_panel(draw, x, y, w, h):
         head_f = fit(draw, head, 20, avail)
         draw.text((tx, ry + 8), head, font=head_f, fill=NAVY)
         sub_f = fit(draw, sub, 17, avail, REGULAR)
-        draw.text((tx, ry + 32), sub, font=sub_f, fill=GREY)
+        draw.text((tx, ry + 32), sub, font=sub_f, fill=INK)
 
 
 def build():
