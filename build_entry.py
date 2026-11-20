@@ -13,6 +13,12 @@ gone, and the GTA VI panel now uses Sensor Tower's updated estimate as
 reported on 20 Nov, labelled (EST.). Every remaining item was verified
 against reporting dated 20 November 2026.
 
+Follow-up fix: two strip items whose underlying events were 19 Nov —
+the Berlin statements on Russia talks and the Houthi strike on Riyadh's
+PIF tower — are replaced with two stories of 20 Nov itself: the UK-EU
+reset summit in Brussels (Reuters, 20 Nov) and Samsung Electronics'
+leadership reshuffle in Seoul (Samsung newsroom / Reuters, 20 Nov).
+
 Run:  python3 build_entry.py   -> writes entry.png next to this script.
 """
 
@@ -206,10 +212,10 @@ TOP_STORIES = [
 ]
 
 ALSO_TODAY = [
-    ("globe", NAVY, "EUROPE READY FOR RUSSIA TALKS",
-     "LEADERS BACK NEGOTIATIONS TO END UKRAINE WAR"),
-    ("burst", RED, "HOUTHIS HIT RIYADH\u2019S TALLEST TOWER",
-     "PIF HQ DAMAGED; SAUDI SAYS NO INJURIES"),
+    ("globe", NAVY, "UK\u2013EU RESET SUMMIT IN BRUSSELS",
+     "FOOD TRADE, YOUTH MOBILITY DEALS ON THE TABLE"),
+    ("rocket", NAVY, "SAMSUNG NAMES NEW MEMORY CHIEF",
+     "HWANG LEADS MEMORY AMID RECORD AI-CHIP PROFITS"),
     ("chart", RED, "WALL STREET TUMBLES AGAIN",
      "S&P 500 FALLS 2.0%: SIXTH STRAIGHT DAY OF LOSSES"),
     ("leaf", NAVY, "COP31: CLOSING DAY, NO DEAL YET",
