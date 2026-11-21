@@ -1,38 +1,37 @@
 #!/usr/bin/env python3
-"""Deliver entry.png to the make.fun output directory.
+"""Ship the built entry image to the make.fun output directory.
 
-The competition harness runs this file; all it has to do is place the
-pre-built front page where the harness looks for it. The destination
-comes from the MAKEFUN_OUTPUT_DIR environment variable and defaults to
-/output. The copy is verified by size before success is reported.
-Nothing here touches the network, a wallet or any credential.
+Copies ``entry.png`` (produced by ``build_entry.py``) into the directory
+named by the ``MAKEFUN_OUTPUT_DIR`` environment variable (default
+``./out``), creating it if needed. The copy is byte-for-byte identical
+to the built image, so the shipped file is deterministic too.
+
+No network access, no randomness, no clock: only the standard library.
+
+Usage:
+    MAKEFUN_OUTPUT_DIR=out python3 main.py
 """
 
 import os
 import shutil
-from pathlib import Path
+import sys
 
-REPO_DIR = Path(__file__).resolve().parent
-FRONT_PAGE = REPO_DIR / "entry.png"
-DEFAULT_OUT = "/output"
+HERE = os.path.dirname(os.path.abspath(__file__))
+ENTRY = os.path.join(HERE, "entry.png")
 
 
-def deliver():
-    if not FRONT_PAGE.is_file():
-        raise SystemExit(
-            "missing {} — run build_entry.py first".format(FRONT_PAGE)
-        )
-    out_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", DEFAULT_OUT))
-    out_dir.mkdir(parents=True, exist_ok=True)
-    destination = out_dir / "entry.png"
-    shutil.copyfile(FRONT_PAGE, destination)
-    if destination.stat().st_size != FRONT_PAGE.stat().st_size:
-        raise SystemExit(
-            "copy incomplete: {} size mismatch".format(destination)
-        )
-    print("copied {} -> {} ({} bytes)".format(
-        FRONT_PAGE, destination, destination.stat().st_size))
+def main():
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "./out")
+    if not os.path.isfile(ENTRY):
+        print(f"entry.png not found at {ENTRY}; run build_entry.py first",
+              file=sys.stderr)
+        return 1
+    os.makedirs(out_dir, exist_ok=True)
+    dest = os.path.join(out_dir, "entry.png")
+    shutil.copyfile(ENTRY, dest)
+    print(f"copied {ENTRY} -> {dest} ({os.path.getsize(dest)} bytes)")
+    return 0
 
 
 if __name__ == "__main__":
-    deliver()
+    raise SystemExit(main())
